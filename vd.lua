@@ -35,6 +35,36 @@ lp.CharacterAdded:Connect(function(newChar)
     uCR(newChar)
 end)
 
+getgenv().settings = {
+    AI = {
+        DetectionRange = 300,
+        PathUpdateRate = 0.1,
+        AttackDistance = 10,
+        RunDistance = 50,
+        RepairDistance = 5,
+        SpinDistance = 15
+    },
+    Pathfinding = {
+        AgentCanJump = false,
+        AgentHeight = 5,
+        WaypointSpacing = 4,
+        Costs = {
+             Water = 100,
+             Plastic = 1,
+             SmoothPlastic = 0.5
+        }
+    },
+    Toggles = {
+        Wallhug = false,
+        Debug = false
+    },
+    Methods = {
+        Farm = true, 
+        Run = true,
+        Loop = false 
+    }
+}
+
 local blacklist = {
     [1834326225] = true,
     [396125889] = true,
@@ -51,6 +81,10 @@ local blacklist = {
 }
 local testers = {"Tgpeek1", "Technique12_12", "urboyfiePoP", "Bva_Back"}
 local WindUI = loadstring(game:HttpGet("https://github.com/Footagesus/WindUI/releases/latest/download/main.lua"))()
+
+if game.PlaceVersion < 10030 then
+    WindUI:Notify({ Title = "Azure Hub", Content = "This game version hasn't been tested for detections, use with aware.", Icon = "triangle-alert", Duration = 5 })
+end
 
 local function getTag(name)
     if getgenv().PREMIUM_KEY == true then
@@ -142,7 +176,7 @@ Config = Tabs.Utilities:Tab({ Title = "|  Configuration", Icon = "settings" })
 
 local updparagraph = Logs:Paragraph({
     Title = "Update Logs",
-    Desc = "07.01.26\n[+] Infinite Lunge (Premium)\n[+] Hook Farm (Screws Farm)\n[+] Auto Aim Charged Spear (Veil, Works)\n[+] Auto Aim Spear (Veil, Works)\n[+] Expand Hitboxes (Universal>Fun)\n[+] No Fall\n[/] Several Bug Fixes (Damage Aura, etc.)\n[/] Improved Things\n[/] Rewrited Code\n\n02.01.26\n[+] Veil (Infinite Abilities, Untested)\n[-] Jeff (Infinite Abilities, Patched)\n[/] Auto Parry Bug Fixes\n[/] More PC Support Features\n\n27.12.25\n[+] FOV Radius\n[/] Improved Invisibility\n[/] Improved Perfect Skill Checks\n\n24.12.25\n[/] Reverted Auto Aim Veil\n[/] Improved Auto Parry\n[/] Heavily Optimized Script\n[/] Optimized Auto Drop Pallets\n[/] Fixed ESP Not Working On Rooftop\n\n23.12.25\n[+] Invisibility\n[+] Auto Perfect Generator\n[+] Auto Perfect Heal\n[+] Potato Graphics (Boost FPS)\n[/] Improve Auto Parry (Works now, slightly improved)\n[/] Improve Auto Aim Veil (Still need to test, unstable)\n[/] ESP: Repaired Gens Highlights Green\n[/] Fix WalkSpeed Changer\n[/] Fix Hitbox Expander\n[/] Unlock FPS (built-in)\n[/] Fixed Lot Of Bugs (ex. script not loading)\n\n20.12.25\n[+] Auto Presents\n[+] ESP: Presents\n[/] Updated To Latest Data\n[/] Fixed New Detections\n[/] Fixed Lot Of Bugs\n\n18.12.25\n[+] Expand Killer Hitboxes (flashlight)\n[/] Improved Auto Attack (revolver)\n[/] Fixed Some Bugs (not desync)\n\n16.12.25\n[/] Fixed Shooting Takes Time\n[-] Expand Survivor Hitboxes (Detected)\n\n12.12.25\nUniversal Tab:\n[+] Desync\n[+] Desync Options\n- Hitbox Improving makes your server-side visualizer sync faster and move forward.\n- Fake Position makes everyone see you at the place you activated Desync.\n\n30.11.25\n[/] Updated To Latest Data\n[-] Grab Nearest Player (Detected)\n[-] Carry Nearest Player (Detected)\n\n14.11.25\n[-] ESP: Pumpkins\n\n8.10.25\n[+] Damage Aura\nDefense:\n[+] Grab Nearest Player (Premium)\n[+] Carry Nearest Player (Premium)\n\n31.10.25\n[+] Updated To Latest Data\n[+] Auto Drop Pallete\n[+] Auto Aim Spear (Veil)\n[+] Remove Veil Clothings\n[+] ESP: Pumpkins\n[/] Bug Fixes\n\n24.09.25\n[+] Hit Sound\n[+] Chase Theme\n[+] In-Built Auto Dodge Slash\n[+] In-Built Fix Carry Bug\n\n23.09.25\n[+] God Mode\n[-] No Damage Patched\n\n3.09.25\n[+] Violence District\n[+] Premium Features",
+    Desc = "08.01.26\n[+] Auto Play (AI, BETA)\n[+] Auto Run (BETA)\n[+] Auto Farm (BETA)\n[+] Auto Loop (BETA)\n[+] Wall Hug\n[+] Version Checker (In-Built)\n\n07.01.26\n[+] Infinite Lunge (Premium)\n[+] Hook Farm (Screws Farm)\n[+] Auto Aim Charged Spear (Veil, Works)\n[+] Auto Aim Spear (Veil, Works)\n[+] Expand Hitboxes (Universal>Fun)\n[+] No Fall\n[/] Several Bug Fixes (Damage Aura, etc.)\n[/] Improved Things\n[/] Rewrited Code\n\n02.01.26\n[+] Veil (Infinite Abilities, Untested)\n[-] Jeff (Infinite Abilities, Patched)\n[/] Auto Parry Bug Fixes\n[/] More PC Support Features\n\n27.12.25\n[+] FOV Radius\n[/] Improved Invisibility\n[/] Improved Perfect Skill Checks\n\n24.12.25\n[/] Reverted Auto Aim Veil\n[/] Improved Auto Parry\n[/] Heavily Optimized Script\n[/] Optimized Auto Drop Pallets\n[/] Fixed ESP Not Working On Rooftop\n\n23.12.25\n[+] Invisibility\n[+] Auto Perfect Generator\n[+] Auto Perfect Heal\n[+] Potato Graphics (Boost FPS)\n[/] Improve Auto Parry (Works now, slightly improved)\n[/] Improve Auto Aim Veil (Still need to test, unstable)\n[/] ESP: Repaired Gens Highlights Green\n[/] Fix WalkSpeed Changer\n[/] Fix Hitbox Expander\n[/] Unlock FPS (built-in)\n[/] Fixed Lot Of Bugs (ex. script not loading)\n\n20.12.25\n[+] Auto Presents\n[+] ESP: Presents\n[/] Updated To Latest Data\n[/] Fixed New Detections\n[/] Fixed Lot Of Bugs\n\n18.12.25\n[+] Expand Killer Hitboxes (flashlight)\n[/] Improved Auto Attack (revolver)\n[/] Fixed Some Bugs (not desync)\n\n16.12.25\n[/] Fixed Shooting Takes Time\n[-] Expand Survivor Hitboxes (Detected)\n\n12.12.25\nUniversal Tab:\n[+] Desync\n[+] Desync Options\n- Hitbox Improving makes your server-side visualizer sync faster and move forward.\n- Fake Position makes everyone see you at the place you activated Desync.\n\n30.11.25\n[/] Updated To Latest Data\n[-] Grab Nearest Player (Detected)\n[-] Carry Nearest Player (Detected)\n\n14.11.25\n[-] ESP: Pumpkins\n\n8.10.25\n[+] Damage Aura\nDefense:\n[+] Grab Nearest Player (Premium)\n[+] Carry Nearest Player (Premium)\n\n31.10.25\n[+] Updated To Latest Data\n[+] Auto Drop Pallete\n[+] Auto Aim Spear (Veil)\n[+] Remove Veil Clothings\n[+] ESP: Pumpkins\n[/] Bug Fixes\n\n24.09.25\n[+] Hit Sound\n[+] Chase Theme\n[+] In-Built Auto Dodge Slash\n[+] In-Built Fix Carry Bug\n\n23.09.25\n[+] God Mode\n[-] No Damage Patched\n\n3.09.25\n[+] Violence District\n[+] Premium Features",
     Locked = false,
     Buttons = {
         {
@@ -1674,6 +1708,54 @@ UMiscSection:Button({
             end
         end
        end
+})
+local UPlaySection = TabHandles.Universal:Section({ 
+    Title = "Auto Play",
+    Icon = "joystick"
+})
+Toggles.AutoPlayHandle = UPlaySection:Toggle({
+   Title =  "Auto Play (AI, BETA)",
+   Desc = "Automatically plays for you, will be improving further.",
+   Value = false,
+   Callback = function(state)
+       getgenv().AIPlaying = state
+       if state then
+           loadstring(game:HttpGet("https://pastefy.app/P7Xzdqfu/raw"))()
+       end
+   end
+})
+UPlaySection:Divider()
+Toggles.RunHandle = UPlaySection:Toggle({
+   Title =  "Auto Run (BETA)",
+   Desc = "Runs from killer if he's close and you're survivor.",
+   Value = false,
+   Callback = function(state)
+       getgenv().settings.Methods.Run = state
+   end
+})
+Toggles.FarmHandle = UPlaySection:Toggle({
+   Title =  "Auto Farm (BETA)",
+   Desc = "Farms generators if you're survivor, survivors if you're killer.",
+   Value = false,
+   Callback = function(state)
+       getgenv().settings.Methods.Farm = state
+   end
+})
+Toggles.LoopHandle = UPlaySection:Toggle({
+   Title =  "Auto Loop (BETA)",
+   Desc = "Loops killer if you're survivor.",
+   Value = false,
+   Callback = function(state)
+       getgenv().settings.Methods.Farm = state
+   end
+})
+Toggles.WallHugHandle = UPlaySection:Toggle({
+   Title =  "Wall Hug",
+   Desc = "Hugs wall while running/farming/looping.",
+   Value = false,
+   Callback = function(state)
+       getgenv().settings.Toggles.Wallhug = state
+   end
 })
 
 local KillerBlatantSection = TabHandles.Killer:Section({ 
