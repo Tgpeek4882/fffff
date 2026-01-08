@@ -34,7 +34,7 @@ lp:GetPropertyChangedSignal("Character"):Connect(function()
     end
 end)
 
-local Library = loadstring(game:HttpGet('https://raw.githubusercontent.com/Aurora-Hub-Ui/azurehub/refs/heads/main/sablib.lua'))()
+local Library = loadstring(game:HttpGet('https://raw.githubusercontent.com/Tgpeek4882/fffff/refs/heads/main/sablib.lua'))()
 
 -- prioritized locals (functions)
 local SavedPosition = root.Position
@@ -61,6 +61,31 @@ local isPlatform
 local slabPart
 local isBoost
 
+local Plots = workspace:FindFirstChild("Plots")
+if Plots then
+     for _, Plot in ipairs(Plots:GetChildren()) do
+        local PlotSign = Plot:FindFirstChild("PlotSign")
+        if PlotSign then
+            local YourBase = PlotSign:FindFirstChild("YourBase")
+            if YourBase and YourBase.Enabled then
+                local hitbox = Plot:FindFirstChild("DeliveryHitbox")
+                if hitbox then
+                    local att0 = Instance.new("Attachment", root)
+                    local att1 = Instance.new("Attachment", workspace.Terrain)
+                    att1.WorldPosition = hitbox.Position
+                    local beam = Instance.new("Beam", root)
+                    beam.Attachment0 = att0
+                    beam.Attachment1 = att1
+                    beam.FaceCamera = true
+                    beam.Width0 = 0.2
+                    beam.Width1 = 0.2
+                    beam.Color = ColorSequence.new(Color3.fromRGB(0, 255, 0))
+                end
+            end
+        end
+    end
+end
+            
 local lR, rI = 0, 1
 local animalsModule = game:GetService("ReplicatedStorage"):FindFirstChild("Datas") and game:GetService("ReplicatedStorage").Datas:FindFirstChild("Animals")
 local AnimalsData = {}
