@@ -1859,7 +1859,7 @@ Toggles.OneTapHandle = KillerSection:Toggle({
 KillerSection:Divider()
 Toggles.AutoAimChargedHandle = KillerSection:Toggle({
        Title = "Auto Aim Charged Spear (Veil)",
-       Desc = "Automatically aims charged spear to the closest survivor.",
+       Desc = "Automatically aims charged spear to the closest survivor. YOU MUST BE HOLDING SPEAR DONT FUCKING BUG REPORT",
        Value = false,
        Callback = function(state)
              AutoAimChargedToggle = state
@@ -1871,7 +1871,7 @@ Toggles.AutoAimChargedHandle = KillerSection:Toggle({
 })
 Toggles.AutoAimNormalHandle = KillerSection:Toggle({
        Title = "Auto Aim Spear (Veil)",
-       Desc = "Automatically aims spear to the closest survivor.",
+       Desc = "Automatically aims spear to the closest survivor. YOU MUST BE HOLDING SPEAR DONT FUCKING BUG REPORT",
        Value = false,
        Callback = function(state)
              AutoAimNormalToggle = state
@@ -2000,7 +2000,7 @@ Toggles.ParrySliderHandle = SurvDefSection:Slider({
 		ParryDistance = tonumber(Value)
 	end
 })
-if supportsHooks then
+if getrawmetatable and setreadonly then
 local mt = getrawmetatable(game)
 local oldNamecall = mt.__namecall
 setreadonly(mt, false)
