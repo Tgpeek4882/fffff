@@ -21,6 +21,30 @@ local function uCR(char)
     character = char
     root = character:WaitForChild("HumanoidRootPart", true)
     hum = character:WaitForChild("Humanoid", true)
+    local Plots = workspace:FindFirstChild("Plots")
+if Plots then
+     for _, Plot in ipairs(Plots:GetChildren()) do
+        local PlotSign = Plot:FindFirstChild("PlotSign")
+        if PlotSign then
+            local YourBase = PlotSign:FindFirstChild("YourBase")
+            if YourBase and YourBase.Enabled then
+                local hitbox = Plot:FindFirstChild("DeliveryHitbox")
+                if hitbox then
+                    local att0 = Instance.new("Attachment", root)
+                    local att1 = Instance.new("Attachment", workspace.Terrain)
+                    att1.WorldPosition = hitbox.Position
+                    local beam = Instance.new("Beam", root)
+                    beam.Attachment0 = att0
+                    beam.Attachment1 = att1
+                    beam.FaceCamera = true
+                    beam.Width0 = 0.5
+                    beam.Width1 = 0.5
+                    beam.Color = ColorSequence.new(Color3.fromRGB(114, 254, 0))
+                end
+            end
+        end
+    end
+end
 end
 
 uCR(lp.Character or lp.CharacterAdded:Wait())
@@ -38,6 +62,7 @@ local Library = loadstring(game:HttpGet('https://raw.githubusercontent.com/Tgpee
 
 -- prioritized locals (functions)
 local SavedPosition = root.Position
+local AimbotToggle = false
 local InstantStealToggle = false
 local WebNoclipToggle = false
 local InfiniteJumpToggle = false
@@ -60,6 +85,7 @@ local isInvisible
 local isPlatform
 local slabPart
 local isBoost
+local isDesync
 
 local Plots = workspace:FindFirstChild("Plots")
 if Plots then
@@ -77,15 +103,16 @@ if Plots then
                     beam.Attachment0 = att0
                     beam.Attachment1 = att1
                     beam.FaceCamera = true
-                    beam.Width0 = 0.2
-                    beam.Width1 = 0.2
-                    beam.Color = ColorSequence.new(Color3.fromRGB(0, 255, 0))
+                    beam.Width0 = 0.5
+                    beam.Width1 = 0.5
+                    beam.Color = ColorSequence.new(Color3.fromRGB(114, 254, 0))
                 end
             end
         end
     end
 end
             
+
 local lR, rI = 0, 1
 local animalsModule = game:GetService("ReplicatedStorage"):FindFirstChild("Datas") and game:GetService("ReplicatedStorage").Datas:FindFirstChild("Animals")
 local AnimalsData = {}
@@ -95,11 +122,14 @@ if animalsModule then
 end
 
 local LastBestBrainrot = nil
-RunService.Heartbeat:Connect(function()
+game:GetService("RunService").Heartbeat:Connect(function()
     local now = tick()
     if now - lR > rI then
         lR = now
-        
+
+        local character = lp.Character
+        local root = character and character:FindFirstChild("HumanoidRootPart")
+
         for _, obj in ipairs(workspace:GetChildren()) do
             if EspPlayersToggle then
                 if obj:IsA("Model") and obj:FindFirstChild("Head") then
@@ -130,6 +160,7 @@ RunService.Heartbeat:Connect(function()
         end
 
         local plotsFolder = workspace:FindFirstChild("Plots")
+        
         if plotsFolder and EspTimersToggle then
             for _, plot in ipairs(plotsFolder:GetChildren()) do
                 local purchases = plot:FindFirstChild("Purchases")
@@ -180,7 +211,7 @@ RunService.Heartbeat:Connect(function()
                 local plotSign = plot:FindFirstChild("PlotSign")
                 local yourBase = plotSign and plotSign:FindFirstChild("YourBase")
                 if yourBase and yourBase.Enabled then
-                continue
+                    continue 
                 end
 
                 for _, item in ipairs(plot:GetChildren()) do
@@ -199,14 +230,15 @@ RunService.Heartbeat:Connect(function()
                 end
             end
             
-            if LastBestBrainrot and LastBestBrainrot ~= bestObj and LastBestBrainrot:FindFirstChild("BestESP") then
-                LastBestBrainrot.BestESP:Destroy()
+            if LastBestBrainrot and LastBestBrainrot ~= bestObj then
+                if LastBestBrainrot:FindFirstChild("BestESP") then LastBestBrainrot.BestESP:Destroy() end
+                if LastBestBrainrot:FindFirstChild("BestBeam") then LastBestBrainrot.BestBeam:Destroy() end
             end
             LastBestBrainrot = bestObj
 
             if bestObj and bestData then
-                local root = bestObj:FindFirstChild("RootPart") or bestObj:FindFirstChild("FakeRootPart") or bestObj.PrimaryPart
-                if root then
+                local bRoot = bestObj:FindFirstChild("RootPart") or bestObj:FindFirstChild("FakeRootPart") or bestObj.PrimaryPart
+                if bRoot then
                     local esp = bestObj:FindFirstChild("BestESP")
                     if not esp then
                         esp = Instance.new("BillboardGui")
@@ -215,19 +247,48 @@ RunService.Heartbeat:Connect(function()
                         esp.StudsOffset = Vector3.new(0, 3, 0)
                         esp.AlwaysOnTop = true
                         esp.Parent = bestObj
-                        esp.Adornee = root
+                        esp.Adornee = bRoot
                         local tl = Instance.new("TextLabel")
                         tl.Size = UDim2.new(1,0,1,0)
                         tl.BackgroundTransparency = 1
                         tl.RichText = true
                         tl.Font = Enum.Font.GothamBold
-                        
                         tl.TextScaled = false
                         tl.TextSize = 18
                         tl.TextStrokeTransparency = 0
                         tl.Parent = esp
                     end
                     
+                    if root then
+                        local beam = bestObj:FindFirstChild("BestBeam")
+                        
+                        local att0 = root:FindFirstChild("BeamAtt0")
+                        if not att0 then
+                            att0 = Instance.new("Attachment")
+                            att0.Name = "BeamAtt0"
+                            att0.Parent = root
+                        end
+
+                        local att1 = bRoot:FindFirstChild("BeamAtt1")
+                        if not att1 then
+                            att1 = Instance.new("Attachment")
+                            att1.Name = "BeamAtt1"
+                            att1.Parent = bRoot
+                        end
+
+                        if not beam then
+                            beam = Instance.new("Beam")
+                            beam.Name = "BestBeam"
+                            beam.Parent = bestObj
+                            beam.FaceCamera = true
+                            beam.Width0 = 0.5
+                            beam.Width1 = 0.5
+                            beam.Color = ColorSequence.new(Color3.fromRGB(255, 0, 0))
+                        end
+                        beam.Attachment0 = att0
+                        beam.Attachment1 = att1
+                    end
+
                     local str = bestData.DisplayName or ""
                     local cleanName = ""
                     for i = 1, #str do
@@ -274,8 +335,9 @@ RunService.Heartbeat:Connect(function()
                     esp:FindFirstChild("TextLabel").Text = line1 .. "\n" .. line2
                 end
             end
-        elseif LastBestBrainrot and LastBestBrainrot:FindFirstChild("BestESP") then
-            LastBestBrainrot.BestESP:Destroy()
+        elseif LastBestBrainrot then
+            if LastBestBrainrot:FindFirstChild("BestESP") then LastBestBrainrot.BestESP:Destroy() end
+            if LastBestBrainrot:FindFirstChild("BestBeam") then LastBestBrainrot.BestBeam:Destroy() end
             LastBestBrainrot = nil
         end
     end
@@ -323,6 +385,82 @@ local function clip()
 	end
 end
 
+local function Enable()
+    if not setfflag then return end
+    setfflag("GameNetPVHeaderRotationalVelocityZeroCutoffExponent", "-5000")
+    setfflag("LargeReplicatorWrite5", "true")
+    setfflag("LargeReplicatorEnabled9", "true")
+    setfflag("TimestepArbiterVelocityCriteriaThresholdTwoDt", "2147483646")
+    setfflag("S2PhysicsSenderRate", "15000")
+    setfflag("DisableDPIScale", "true")
+    setfflag("MaxDataPacketPerSend", "2147483647")
+    setfflag("PhysicsSenderMaxBandwidthBps", "20000")
+    setfflag("CheckPVCachedVelThresholdPercent", "10")
+    setfflag("MaxMissedWorldStepsRemembered", "-2147483648")
+    setfflag("WorldStepMax", "30")
+    setfflag("StreamJobNOUVolumeLengthCap", "2147483647")
+    setfflag("DebugSendDistInSteps", "-2147483648")
+    setfflag("LargeReplicatorRead5", "true")
+    setfflag("GameNetDontSendRedundantNumTimes", "1")
+    setfflag("CheckPVLinearVelocityIntegrateVsDeltaPositionThresholdPercent", "1")
+    setfflag("LargeReplicatorSerializeRead3", "true")
+    setfflag("NextGenReplicatorEnabledWrite4", "true")
+    setfflag("AngularVelociryLimit", "360")
+    setfflag("CheckPVDifferencesForInterpolationMinRotVelThresholdRadsPerSecHundredth", "1")
+    setfflag("GameNetDontSendRedundantDeltaPositionMillionth", "1")
+    setfflag("InterpolationFrameVelocityThresholdMillionth", "5")
+    setfflag("StreamJobNOUVolumeCap", "2147483647")
+    setfflag("InterpolationFrameRotVelocityThresholdMillionth", "5")
+    setfflag("CheckPVDifferencesForInterpolationMinVelThresholdStudsPerSecHundredth", "1")
+    setfflag("ReplicationFocusNouExtentsSizeCutoffForPauseStuds", "2147483647")
+    setfflag("InterpolationFramePositionThresholdMillionth", "5")
+    setfflag("TimestepArbiterHumanoidTurningVelThreshold", "1")
+    setfflag("SimOwnedNOUCountThresholdMillionth", "2147483647")
+    setfflag("GameNetPVHeaderLinearVelocityZeroCutoffExponent", "-5000")
+    setfflag("CheckPVCachedRotVelThresholdPercent", "10")
+    setfflag("TimestepArbiterOmegaThou", "1073741823")
+    setfflag("MaxAcceptableUpdateDelay", "1")
+    setfflag("LargeReplicatorSerializeWrite4", "true")
+end
+
+local function Disable()
+    if not setfflag then return end
+    setfflag("GameNetPVHeaderRotationalVelocityZeroCutoffExponent", "-2")
+    setfflag("LargeReplicatorWrite5", "true")
+    setfflag("LargeReplicatorEnabled9", "true")
+    setfflag("AngularVelociryLimit", "240")
+    setfflag("TimestepArbiterVelocityCriteriaThresholdTwoDt", "250")
+    setfflag("S2PhysicsSenderRate", "15")
+    setfflag("DisableDPIScale", "false")
+    setfflag("MaxDataPacketPerSend", "1")
+    setfflag("PhysicsSenderMaxBandwidthBps", "38760")
+    setfflag("CheckPVCachedVelThresholdPercent", "75")
+    setfflag("MaxMissedWorldStepsRemembered", "16")
+    setfflag("WorldStepMax", "30")
+    setfflag("StreamJobNOUVolumeLengthCap", "100")
+    setfflag("DebugSendDistInSteps", "5")
+    setfflag("LargeReplicatorRead5", "true")
+    setfflag("GameNetDontSendRedundantNumTimes", "5")
+    setfflag("CheckPVLinearVelocityIntegrateVsDeltaPositionThresholdPercent", "1000")
+    setfflag("LargeReplicatorSerializeRead3", "true")
+    setfflag("NextGenReplicatorEnabledWrite4", "true")
+    setfflag("CheckPVDifferencesForInterpolationMinVelThresholdStudsPerSecHundredth", "100")
+    setfflag("CheckPVDifferencesForInterpolationMinRotVelThresholdRadsPerSecHundredth", "300")
+    setfflag("GameNetDontSendRedundantDeltaPositionMillionth", "3000")
+    setfflag("InterpolationFrameVelocityThresholdMillionth", "100")
+    setfflag("StreamJobNOUVolumeCap", "10000")
+    setfflag("InterpolationFrameRotVelocityThresholdMillionth", "100")
+    setfflag("ReplicationFocusNouExtentsSizeCutoffForPauseStuds", "128")
+    setfflag("InterpolationFramePositionThresholdMillionth", "100")
+    setfflag("TimestepArbiterHumanoidTurningVelThreshold", "17")
+    setfflag("CheckPVCachedRotVelThresholdPercent", "250")
+    setfflag("GameNetPVHeaderLinearVelocityZeroCutoffExponent", "-2")
+    setfflag("SimOwnedNOUCountThresholdMillionth", "1000")
+    setfflag("TimestepArbiterOmegaThou", "10000")
+    setfflag("MaxAcceptableUpdateDelay", "15")
+    setfflag("LargeReplicatorSerializeWrite4", "true")
+end
+
 local function laser()
     if not root then return end
     local tool = (function() local items = {}; for _, c in pairs({lp.Backpack, character}) do for _, v in pairs(c:GetChildren()) do if v:IsA("Tool") then table.insert(items, v) end end end for _, n in pairs({"laser cape"}) do for _, v in pairs(items) do if v.Name:lower():find(n) then return v end end end end)()
@@ -356,6 +494,74 @@ local function laser()
         UseItem:FireServer(unpack(args))
     end
 end
+
+local function fireaimbot(tool)
+    if not character or not root then return end
+    local closestPlayer = nil
+    local closestChar = nil
+    local maxDist = math.huge
+    
+    for _, p in pairs(Players:GetPlayers()) do
+        if p ~= lp and p.Character then
+            local pRoot = p.Character:FindFirstChild("HumanoidRootPart")
+            local pHum = p.Character:FindFirstChild("Humanoid")
+            
+            if pRoot and pHum and pHum.Health > 0 then
+                local dist = (root.Position - pRoot.Position).Magnitude
+                if dist < maxDist then
+                    maxDist = dist
+                    closestPlayer = p
+                    closestChar = p.Character
+                end
+            end
+        end
+    end
+
+    if closestPlayer and closestChar then
+        local toolName = tool.Name:lower()
+        local args = {}
+        if toolName:find("laser") then
+            local pos = closestChar.HumanoidRootPart.Position
+            args = {
+                vector.create(pos.X, pos.Y, pos.Z),
+                closestChar.HumanoidRootPart
+            }
+        elseif toolName:find("web") or toolName:find("slinger") then
+            local pos = closestChar.HumanoidRootPart.Position
+            args = {
+                vector.create(pos.X, pos.Y, pos.Z),
+                closestChar.HumanoidRootPart
+            }
+        elseif toolName:find("beehive") then
+            args = {
+                closestPlayer
+            }
+        elseif toolName:find("taser") then
+            local targetPart = closestChar:FindFirstChild("UpperTorso") or closestChar:FindFirstChild("HumanoidRootPart")
+            args = {
+                targetPart
+            }
+        end
+        if #args > 0 then
+            UseItem:FireServer(unpack(args))
+        end
+    end
+end
+
+UserInputService.InputBegan:Connect(function(input, gameProcessed)
+    if gameProcessed then return end
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        if character and AimbotToggle then
+            local tool = character:FindFirstChildWhichIsA("Tool")
+            if tool then
+                local name = tool.Name:lower()
+                if name:find("laser") or name:find("beehive") or name:find("web") or name:find("slinger") or name:find("taser") then
+                    fireaimbot(tool)
+                end
+            end
+        end
+    end
+end)
 
 local function flytobasegui()
     local Players = game:GetService("Players")
@@ -970,6 +1176,70 @@ local function slapgui()
     return Destroy
 end
 
+local function desyncgui()
+    local Players = game:GetService("Players")
+    local UserInputService = game:GetService("UserInputService")
+    local CoreGui = game:GetService("CoreGui")
+    local lp = Players.LocalPlayer
+    
+    local ScreenGui = Instance.new("ScreenGui")
+    ScreenGui.Name = tostring(math.random(1, 1000000))
+    ScreenGui.ResetOnSpawn = false
+    
+    if gethui then 
+        ScreenGui.Parent = gethui() 
+    elseif CoreGui then 
+        ScreenGui.Parent = CoreGui 
+    else 
+        ScreenGui.Parent = lp:WaitForChild("PlayerGui") 
+    end
+
+    local BoostButton = Instance.new("TextButton")
+    BoostButton.Name = "BoostBtn"
+    BoostButton.Size = UDim2.new(0, 100, 0, 35)
+    BoostButton.Position = UDim2.new(1, -220, 0, 145)
+    BoostButton.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+    BoostButton.Text = "Desync (G)"
+    BoostButton.TextColor3 = Color3.new(1, 1, 1)
+    BoostButton.Font = Enum.Font.GothamBold
+    BoostButton.TextSize = 12
+    BoostButton.Parent = ScreenGui
+
+    local SetPosCorner = Instance.new("UICorner")
+    SetPosCorner.CornerRadius = UDim.new(0, 8)
+    SetPosCorner.Parent = BoostButton
+    
+    local function ToggleBoost()
+        if not hum then return end
+
+        isDesync = not isDesync
+        if isDesync then
+            BoostButton.BackgroundColor3 = Color3.fromRGB(0, 150, 255)
+            BoostButton.Text = "ON (G)"
+            Enable()
+        else
+            BoostButton.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+            BoostButton.Text = "Desync (G)"
+            Disable()
+        end
+    end
+
+    BoostButton.MouseButton1Click:Connect(ToggleBoost)
+    
+    local InputConnection = UserInputService.InputBegan:Connect(function(input, gpe)
+        if not gpe and input.KeyCode == Enum.KeyCode.G then
+            ToggleBoost()
+        end
+    end)
+
+    local function Destroy()
+        if InputConnection then InputConnection:Disconnect() end
+        ScreenGui:Destroy()
+    end
+    
+    return Destroy
+end
+
 local Window = Library:CreateWindow({ 
     Title = "Azure Hub | Steal A Brainrot",
     SaveName = "AzureHubSab",
@@ -1047,7 +1317,7 @@ local Combat = Tabs.Main.CreateSection({
     Title = "Combat",
     Icon = "swords"
 })
-Combat.CreateToggle({
+--[[Combat.CreateToggle({
     Title = "Instant Steal",
     Desc = "Must have carpet, useful in pvps.",
     Value = false,
@@ -1071,6 +1341,29 @@ Combat.CreateToggle({
        else
            getgenv().RemoveStealGui()
            getgenv().RemoveStealGui = nil
+       end
+    end
+})]]
+Combat.CreateToggle({
+    Title = "Aimbot Nearest",
+    Desc = "Hits nearest player with attacking tools.",
+    Value = false,
+    Keybind = Enum.KeyCode.O,
+    Callback = function(v, Set)
+        AimbotToggle = v
+    end
+})
+Combat.CreateToggle({
+    Title = "Melee Aura",
+    Desc = "Slaps player near you. Works while stealing.",
+    Value = false,
+    Keybind = Enum.KeyCode.A,
+    Callback = function(v, Set)
+        if v then
+           getgenv().RemoveSlapGui = slapgui()
+       else
+           getgenv().RemoveSlapGui()
+           getgenv().RemoveSlapGui = nil
        end
     end
 })
@@ -1107,20 +1400,6 @@ Combat.CreateToggle({
        end
     end
 })
-Combat.CreateToggle({
-    Title = "Melee Aura",
-    Desc = "Slaps player near you. Works while stealing.",
-    Value = false,
-    Keybind = Enum.KeyCode.A,
-    Callback = function(v, Set)
-        if v then
-           getgenv().RemoveSlapGui = slapgui()
-       else
-           getgenv().RemoveSlapGui()
-           getgenv().RemoveSlapGui = nil
-       end
-    end
-})
 
 local Misc = Tabs.Main.CreateSection({
     Title = "Misc",
@@ -1141,43 +1420,40 @@ Misc.CreateButton({
             return
         end
 
-        local success, err = pcall(function()
-            setfflag("GameNetPVHeaderRotationalVelocityZeroCutoffExponent", "-5000")
-        end)
-    
-        setfflag("LargeReplicatorWrite5", "true")
-        setfflag("LargeReplicatorEnabled9", "true")
-        setfflag("AngularVelociryLimit", "360")
-        setfflag("TimestepArbiterVelocityCriteriaThresholdTwoDt", "2147483646")
-        setfflag("S2PhysicsSenderRate", "15000")
-        setfflag("DisableDPIScale", "true")
-        setfflag("MaxDataPacketPerSend", "2147483647")
-        setfflag("PhysicsSenderMaxBandwidthBps", "20000")
-        setfflag("SimOwnedNOUCountThresholdMillionth", "2147483647")
-        setfflag("MaxMissedWorldStepsRemembered", "-2147483648")
-        setfflag("CheckPVDifferencesForInterpolationMinVelThresholdStudsPerSecHundredth", "1")
-        setfflag("StreamJobNOUVolumeCap", "2147483647")
-        setfflag("DebugSendDistInSteps", "-2147483648")
-        setfflag("LargeReplicatorRead5", "true")
-        setfflag("GameNetDontSendRedundantNumTimes", "1")
-        setfflag("CheckPVLinearVelocityIntegrateVsDeltaPositionThresholdPercent", "1")
-        setfflag("CheckPVCachedRotVelThresholdPercent", "10")
-        setfflag("LargeReplicatorSerializeRead3", "true")
-        setfflag("ReplicationFocusNouExtentsSizeCutoffForPauseStuds", "2147483647")
-        setfflag("NextGenReplicatorEnabledWrite4", "true")
-        setfflag("CheckPVDifferencesForInterpolationMinRotVelThresholdRadsPerSecHundredth", "1")
-        setfflag("GameNetDontSendRedundantDeltaPositionMillionth", "1")
-        setfflag("InterpolationFrameVelocityThresholdMillionth", "5")
-        setfflag("InterpolationFrameRotVelocityThresholdMillionth", "5")
-        setfflag("WorldStepMax", "30")
-        setfflag("TimestepArbiterHumanoidLinearVelThreshold", "1")
-        setfflag("InterpolationFramePositionThresholdMillionth", "5")
-        setfflag("TimestepArbiterHumanoidTurningVelThreshold", "1")
-        setfflag("GameNetPVHeaderLinearVelocityZeroCutoffExponent", "-5000")
-        setfflag("CheckPVCachedVelThresholdPercent", "10")
-        setfflag("TimestepArbiterOmegaThou", "1073741823")
-        setfflag("MaxAcceptableUpdateDelay", "1")
-        setfflag("LargeReplicatorSerializeWrite4", "true")
+        setfflag("GameNetPVHeaderRotationalVelocityZeroCutoffExponent", "-5000")
+    setfflag("LargeReplicatorWrite5", "true")
+    setfflag("LargeReplicatorEnabled9", "true")
+    setfflag("TimestepArbiterVelocityCriteriaThresholdTwoDt", "2147483646")
+    setfflag("S2PhysicsSenderRate", "15000")
+    setfflag("DisableDPIScale", "true")
+    setfflag("MaxDataPacketPerSend", "2147483647")
+    setfflag("PhysicsSenderMaxBandwidthBps", "20000")
+    setfflag("CheckPVCachedVelThresholdPercent", "10")
+    setfflag("MaxMissedWorldStepsRemembered", "-2147483648")
+    setfflag("WorldStepMax", "30")
+    setfflag("StreamJobNOUVolumeLengthCap", "2147483647")
+    setfflag("DebugSendDistInSteps", "-2147483648")
+    setfflag("LargeReplicatorRead5", "true")
+    setfflag("GameNetDontSendRedundantNumTimes", "1")
+    setfflag("CheckPVLinearVelocityIntegrateVsDeltaPositionThresholdPercent", "1")
+    setfflag("LargeReplicatorSerializeRead3", "true")
+    setfflag("NextGenReplicatorEnabledWrite4", "true")
+    setfflag("AngularVelociryLimit", "360")
+    setfflag("CheckPVDifferencesForInterpolationMinRotVelThresholdRadsPerSecHundredth", "1")
+    setfflag("GameNetDontSendRedundantDeltaPositionMillionth", "1")
+    setfflag("InterpolationFrameVelocityThresholdMillionth", "5")
+    setfflag("StreamJobNOUVolumeCap", "2147483647")
+    setfflag("InterpolationFrameRotVelocityThresholdMillionth", "5")
+    setfflag("CheckPVDifferencesForInterpolationMinVelThresholdStudsPerSecHundredth", "1")
+    setfflag("ReplicationFocusNouExtentsSizeCutoffForPauseStuds", "2147483647")
+    setfflag("InterpolationFramePositionThresholdMillionth", "5")
+    setfflag("TimestepArbiterHumanoidTurningVelThreshold", "1")
+    setfflag("SimOwnedNOUCountThresholdMillionth", "2147483647")
+    setfflag("GameNetPVHeaderLinearVelocityZeroCutoffExponent", "-5000")
+    setfflag("CheckPVCachedRotVelThresholdPercent", "10")
+    setfflag("TimestepArbiterOmegaThou", "1073741823")
+    setfflag("MaxAcceptableUpdateDelay", "1")
+    setfflag("LargeReplicatorSerializeWrite4", "true")
 
         if hum then
             hum:ChangeState(Enum.HumanoidStateType.Dead)
@@ -1195,6 +1471,37 @@ Misc.CreateButton({
                 Duration = 3
             })
             Desynced = true
+        end
+    end
+})
+Misc.CreateToggle({
+    Title = "Desync Toggle",
+    Desc = "Makes you desyncable with toggle.",
+    Value = false,
+    Keybind = Enum.KeyCode.G,
+    Callback = function(v, Set)
+        if v then
+            getgenv().RemoveDesyncGui = desyncgui()
+            if not getgenv().Desynced then
+                getgenv().Desynced = true
+                Enable()
+                if character and hum then
+                hum:ChangeState(Enum.HumanoidStateType.Dead)
+                    character:ClearAllChildren()
+                    local Dummy = Instance.new("Model")
+                    Dummy.Parent = workspace
+                    lp.Character = Dummy
+                    task.wait()
+                    lp.Character = character
+                    Dummy:Destroy()
+                    lp.CharacterAdded:Wait()
+                    task.wait(0.5)
+                    Disable()
+                end
+            end
+        else
+            getgenv().RemoveDesyncGui()
+            getgenv().RemoveDesyncGui = nil
         end
     end
 })
@@ -1285,6 +1592,7 @@ Misc.CreateToggle({
         JumpBoostToggle = v
     end
 })
+
 Misc.CreateToggle({
     Title = "X-Ray",
     Desc = "Makes bases transparent.",
@@ -1292,28 +1600,43 @@ Misc.CreateToggle({
     Keybind = Enum.KeyCode.X,
     Callback = function(v, Set)
         XRayToggle = v
-        workspace.Plots.DescendantAdded:Connect(function(child)
-            if child:IsA("BasePart") and XRayToggle then
-                if child:IsDescendantOf(workspace.Plots) and child.Parent and child.Parent.Name == "Decorations" or child.Parent.Parent.Name == "Decorations" then
-                    child.Transparency = 0.5
-                end
-            end
-        end)
-        if v then
-            for _, plotModel in pairs(workspace.Plots:GetChildren()) do
-                for _, child in pairs(plotModel.Decorations:GetDescendants()) do
-                    if child:IsA("BasePart") then
-                        child.Transparency = 0.5
+        local trans = 0
+        if v then trans = 0.5 end
+        for _, plot in pairs(workspace.Plots:GetChildren()) do
+            if plot:FindFirstChild("Decorations") then
+                for _, part in pairs(plot.Decorations:GetDescendants()) do
+                    if part:IsA("BasePart") then 
+                        part.Transparency = trans 
                     end
                 end
+            end
+            if plot:FindFirstChild("Skin") then
+                for _, folder in pairs(plot.Skin:GetDescendants()) do
+                    if string.find(folder.Name, "Decoration") then
+                        for _, part in pairs(folder:GetDescendants()) do
+                            if part:IsA("BasePart") then 
+                                part.Transparency = trans 
+                            end
+                        end
+                    end
+                end
+            end
+        end
+        if v then
+            if not getgenv().XRayConnection then
+                getgenv().XRayConnection = workspace.Plots.DescendantAdded:Connect(function(child)
+                    if XRayToggle and child:IsA("BasePart") then
+                        task.wait()
+                        if child.Parent and (child.Parent.Name == "Decorations" or string.find(child.Parent.Name, "Decoration")) then
+                            child.Transparency = 0.5
+                        end
+                    end
+                end)
             end
         else
-            for _, plotModel in pairs(workspace.Plots:GetChildren()) do
-                for _, child in pairs(plotModel.Decorations:GetDescendants()) do
-                    if child:IsA("BasePart")  then
-                        child.Transparency = 0
-                    end
-                end
+            if getgenv().XRayConnection then 
+                getgenv().XRayConnection:Disconnect()
+                getgenv().XRayConnection = nil
             end
         end
     end

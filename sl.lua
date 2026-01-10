@@ -118,7 +118,7 @@ local TabHandles = {
 
 local updparagraph = Logs:Paragraph({
     Title = "Update Logs",
-    Desc = "3.12.25\n[+] Fake Feint\n[+] Fake Slap\n[+] Auto Demon Fox\n[+] Auto Bat (Untested)\n[+] Auto Roll Style\n[+] Target Style\n\n28.12.25\n[/] Updated To Latest Data\n[+] Auto Counter Slap\n- Must have demon fox/heavyweight.\n\n21.12.25\n[+] Auto Dodge: Demon Fox\n[/] Updated To Latest Data\n\n16.12.25\n[/] Improved Auto Dodge (Bat)\n[/] Fixed Bugs\n\n14.12.25\n[+] Randomized Buffers (Premium, No Detections)\n[/] Improve Auto Dodge\n- Supported Auto Dodge: Slap, Ninja, Swap, Heavyweight, Bat, Demon Fox.\n\n13.12.25\n[+] Slap\n[+] Features\n[+] Fixed Detections",
+    Desc = "3.01.26\n[+] Fake Feint\n[+] Fake Slap\n[+] Auto Demon Fox\n[+] Auto Bat (Untested)\n[+] Auto Roll Style\n[+] Target Style\n\n28.12.25\n[/] Updated To Latest Data\n[+] Auto Counter Slap\n- Must have demon fox/heavyweight.\n\n21.12.25\n[+] Auto Dodge: Demon Fox\n[/] Updated To Latest Data\n\n16.12.25\n[/] Improved Auto Dodge (Bat)\n[/] Fixed Bugs\n\n14.12.25\n[+] Randomized Buffers (Premium, No Detections)\n[/] Improve Auto Dodge\n- Supported Auto Dodge: Slap, Ninja, Swap, Heavyweight, Bat, Demon Fox.\n\n13.12.25\n[+] Slap\n[+] Features\n[+] Fixed Detections",
     Locked = false,
     Buttons = {
         {
