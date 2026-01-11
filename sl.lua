@@ -118,7 +118,7 @@ local TabHandles = {
 
 local updparagraph = Logs:Paragraph({
     Title = "Update Logs",
-    Desc = "3.01.26\n[+] Fake Feint\n[+] Fake Slap\n[+] Auto Demon Fox\n[+] Auto Bat (Untested)\n[+] Auto Roll Style\n[+] Target Style\n\n28.12.25\n[/] Updated To Latest Data\n[+] Auto Counter Slap\n- Must have demon fox/heavyweight.\n\n21.12.25\n[+] Auto Dodge: Demon Fox\n[/] Updated To Latest Data\n\n16.12.25\n[/] Improved Auto Dodge (Bat)\n[/] Fixed Bugs\n\n14.12.25\n[+] Randomized Buffers (Premium, No Detections)\n[/] Improve Auto Dodge\n- Supported Auto Dodge: Slap, Ninja, Swap, Heavyweight, Bat, Demon Fox.\n\n13.12.25\n[+] Slap\n[+] Features\n[+] Fixed Detections",
+    Desc = "11.01.26\n[+] Auto Dodge: Boxer (Premium, Early Update)\n[+] Target Style: Boxer (Premium, Early Update)\n\n3.01.26\n[+] Fake Feint\n[+] Fake Slap\n[+] Auto Demon Fox\n[+] Auto Bat (Untested)\n[+] Auto Roll Style\n[+] Target Style\n\n28.12.25\n[/] Updated To Latest Data\n[+] Auto Counter Slap\n- Must have demon fox/heavyweight.\n\n21.12.25\n[+] Auto Dodge: Demon Fox\n[/] Updated To Latest Data\n\n16.12.25\n[/] Improved Auto Dodge (Bat)\n[/] Fixed Bugs\n\n14.12.25\n[+] Randomized Buffers (Premium, No Detections)\n[/] Improve Auto Dodge\n- Supported Auto Dodge: Slap, Ninja, Swap, Heavyweight, Bat, Demon Fox.\n\n13.12.25\n[+] Slap\n[+] Features\n[+] Fixed Detections",
     Locked = false,
     Buttons = {
         {
@@ -343,9 +343,17 @@ AutoRollHandle = TabHandles.Lobby:Toggle({
 		end
 	end
 })
+
+local styleList = { 
+    "Ninja", "Magician", "All or Nothing", "Mind Reader", 
+    "Rabbit", "Swap", "Heavyweight", "Bat", "Demon Fox", "Copy" 
+}
+if getTag(lp.Name) == "[ PREMIUM ]" then
+    table.insert(styleList, "Boxer")
+end
 local RollDropdownHandle = TabHandles.Lobby:Dropdown({
         Title = "Target Style",
-        Values = { "Ninja", "Magician", "All or Nothing", "Mind Reader", "Rabbit", "Swap", "Heavyweight", "Bat", "Demon Fox", "Copy" },
+        Values = styleList,
         Value = { "" },
         Multi = true,
         AllowNone = false,
@@ -624,6 +632,19 @@ if ConfigManager then
     end
 end
 
+local dodgeSounds = {
+    "71441046303493", "74444335852537", "110521080732746", 
+    "124228381910843", "132891780242917", "78547033616792"--, "135216872825858"
+}
+local counterSounds = {
+    "71441046303493", "74444335852537", "110521080732746", 
+    "124228381910843", "132891780242917"--, "135216872825858"
+}
+if getTag(lp.Name) == "[ PREMIUM ]" then
+    table.insert(dodgeSounds, "71159838062692")
+    table.insert(counterSounds, "71159838062692")
+end
+
 workspace.ChildAdded:Connect(function(obj)
     local gui = lp:FindFirstChildOfClass("PlayerGui")
     local slapGameUI = gui and gui:FindFirstChild("SlapGameUI")
@@ -635,16 +656,6 @@ workspace.ChildAdded:Connect(function(obj)
     local abilityLabel = container and container:FindFirstChild("Ability"):FindFirstChild("Contents"):FindFirstChild("Text")
     
     if not feint then return end
-    
-    local dodgeSounds = {
-        "71441046303493", "74444335852537", "110521080732746", 
-        "124228381910843", "132891780242917", "78547033616792"
-    }
-    local counterSounds = {
-        "71441046303493", "74444335852537", "110521080732746", 
-        "124228381910843", "132891780242917"
-    }
-
     local targetSound = nil
     if obj:IsA("Sound") then
         targetSound = obj
@@ -732,6 +743,142 @@ local args = {
                     if abilityRel then
                         abilityRel:FireServer(unpack(args))
                     end
+                end
+            end
+        end
+    end
+end)
+
+local currentTarget = nil
+local animConnection = nil
+local function getClosestPlayer()
+    local closest = nil
+    local minDist = 100
+    
+    if not lp.Character or not lp.Character:FindFirstChild("HumanoidRootPart") then return nil end
+
+    for _, p in pairs(game.Players:GetPlayers()) do
+        if p ~= lp and p.Character and p.Character:FindFirstChild("HumanoidRootPart") then
+            local dist = (lp.Character.HumanoidRootPart.Position - p.Character.HumanoidRootPart.Position).Magnitude
+            if dist < minDist then
+                minDist = dist
+                closest = p
+            end
+        end
+    end
+    return closest
+end
+
+task.spawn(function()
+    while task.wait(0.2) do
+        local newTarget = getClosestPlayer()
+        if newTarget ~= currentTarget then
+            if animConnection then
+                animConnection:Disconnect()
+                animConnection = nil
+            end
+
+            currentTarget = newTarget
+            if currentTarget and currentTarget.Character then
+                local hum = currentTarget.Character:FindFirstChild("Humanoid")
+                local animator = hum and hum:FindFirstChild("Animator")
+                
+                if animator then
+                    animConnection = animator.AnimationPlayed:Connect(function(track)
+                        local gui = lp:FindFirstChildOfClass("PlayerGui")
+                        local slapGameUI = gui and gui:FindFirstChild("SlapGameUI")
+                        if not slapGameUI then return end
+                        
+                        local inGameHUD = slapGameUI:FindFirstChild("InGameHUD") or slapGameUI:FindFirstChild("InGameHUD_Mobile")
+                        local container = inGameHUD and inGameHUD:FindFirstChild("BattleOptions") and inGameHUD.BattleOptions:FindFirstChild("Container")
+                        local feint = container and (container:FindFirstChild("Feint") or container:FindFirstChild("feint"))
+                        local abilityLabel = container and container:FindFirstChild("Ability"):FindFirstChild("Contents"):FindFirstChild("Text")
+                        
+                        if not feint then return end
+
+                        local animId = track.Animation.AnimationId
+                        if AutoDodgeToggle and not feint.Visible then
+                            local idMatch = false
+                            for _, id in ipairs(dodgeSounds) do
+                                if animId:find(id) then
+                                    idMatch = true
+                                    break
+                                end
+                            end
+
+                            if idMatch then
+                                local chance = math.random(0, 99)
+                                if chance <= AutoDodgeChance then
+                                    local randomT = math.random(5, 10) / 100
+                                    task.spawn(function()
+                                        task.wait(randomT)
+                                        local bufferToUse
+                                        if getTag(lp.Name) == "[ PREMIUM ]" then
+                                            local premiumBuffers = {
+                                                buffer.fromstring("\001;\140\017R\160O\218A"),
+                                                buffer.fromstring("\001.\174vI\160O\218A"), 
+                                                buffer.fromstring("\001|\r\195o\160O\218A"),
+                                                buffer.fromstring("\001j\222\169\220|O\218A")
+                                            }
+                                            bufferToUse = premiumBuffers[math.random(#premiumBuffers)]
+                                        else
+                                            bufferToUse = buffer.fromstring("\001j\222\169\220|O\218A")
+                                        end
+                                        
+                                        local zap = game:GetService("ReplicatedStorage"):FindFirstChild("ZAP")
+                                        local combat = zap and zap:FindFirstChild("COMBAT_RELIABLE")
+                                        if combat then
+                                            combat:FireServer(bufferToUse, {})
+                                        end
+                                    end)
+                                else
+                                    WindUI:Notify({
+                                        Title = "Asure Hub",
+                                        Content = chance .. " > " .. AutoDodgeChance .. " (Dodge Failed)",
+                                        Icon = "triangle-alert",
+                                        Duration = 1.5
+                                    })
+                                end
+                            end
+                        end
+                        
+                        if AutoCounterToggle and abilityLabel and not feint.Visible then
+                            local isCounterSound = false
+                            for _, id in ipairs(counterSounds) do
+                                if animId:find(id) then
+                                    isCounterSound = true
+                                    break
+                                end
+                            end
+                            
+                            if isCounterSound then
+                                local rawText = abilityLabel.ContentText or ""
+                                local cleanText = string.lower(string.gsub(rawText, "[^%w]", ""))
+
+                                if cleanText == "demonfox" or cleanText == "brace" then
+                                    local realtext = cleanText
+                                    local lengthByte = "\b"
+
+                                    if cleanText == "brace" then
+                                        realtext = "heavyweight"
+                                        lengthByte = "\v"
+                                    end
+
+                                    local args = {
+                                        buffer.fromstring("\000" .. lengthByte .. "\000" .. realtext),
+                                        {}
+                                    }
+                                    
+                                    local zap = game:GetService("ReplicatedStorage"):FindFirstChild("ZAP")
+                                    local abilityRel = zap and zap:FindFirstChild("ABILITY_RELIABLE")
+                                    
+                                    if abilityRel then
+                                        abilityRel:FireServer(unpack(args))
+                                    end
+                                end
+                            end
+                        end
+                    end)
                 end
             end
         end
