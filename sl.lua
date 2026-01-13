@@ -118,7 +118,7 @@ local TabHandles = {
 
 local updparagraph = Logs:Paragraph({
     Title = "Update Logs",
-    Desc = "11.01.26\n[+] Auto Dodge: Boxer (Premium, Early Update)\n[+] Target Style: Boxer (Premium, Early Update)\n\n3.01.26\n[+] Fake Feint\n[+] Fake Slap\n[+] Auto Demon Fox\n[+] Auto Bat (Untested)\n[+] Auto Roll Style\n[+] Target Style\n\n28.12.25\n[/] Updated To Latest Data\n[+] Auto Counter Slap\n- Must have demon fox/heavyweight.\n\n21.12.25\n[+] Auto Dodge: Demon Fox\n[/] Updated To Latest Data\n\n16.12.25\n[/] Improved Auto Dodge (Bat)\n[/] Fixed Bugs\n\n14.12.25\n[+] Randomized Buffers (Premium, No Detections)\n[/] Improve Auto Dodge\n- Supported Auto Dodge: Slap, Ninja, Swap, Heavyweight, Bat, Demon Fox.\n\n13.12.25\n[+] Slap\n[+] Features\n[+] Fixed Detections",
+    Desc = "11.01.26\n[+] Auto Dodge: Boxer\n[+] Target Style: Boxer\n\n3.01.26\n[+] Fake Feint\n[+] Fake Slap\n[+] Auto Demon Fox\n[+] Auto Bat (Untested)\n[+] Auto Roll Style\n[+] Target Style\n\n28.12.25\n[/] Updated To Latest Data\n[+] Auto Counter Slap\n- Must have demon fox/heavyweight.\n\n21.12.25\n[+] Auto Dodge: Demon Fox\n[/] Updated To Latest Data\n\n16.12.25\n[/] Improved Auto Dodge (Bat)\n[/] Fixed Bugs\n\n14.12.25\n[+] Randomized Buffers (Premium, No Detections)\n[/] Improve Auto Dodge\n- Supported Auto Dodge: Slap, Ninja, Swap, Heavyweight, Bat, Demon Fox.\n\n13.12.25\n[+] Slap\n[+] Features\n[+] Fixed Detections",
     Locked = false,
     Buttons = {
         {
@@ -346,11 +346,11 @@ AutoRollHandle = TabHandles.Lobby:Toggle({
 
 local styleList = { 
     "Ninja", "Magician", "All or Nothing", "Mind Reader", 
-    "Rabbit", "Swap", "Heavyweight", "Bat", "Demon Fox", "Copy" 
+    "Rabbit", "Boxer", "Swap", "Heavyweight", "Bat", "Demon Fox", "Copy" 
 }
-if getTag(lp.Name) == "[ PREMIUM ]" then
+--[[if getTag(lp.Name) == "[ PREMIUM ]" then
     table.insert(styleList, "Boxer")
-end
+end]]
 local RollDropdownHandle = TabHandles.Lobby:Dropdown({
         Title = "Target Style",
         Values = styleList,
@@ -634,16 +634,16 @@ end
 
 local dodgeSounds = {
     "71441046303493", "74444335852537", "110521080732746", 
-    "124228381910843", "132891780242917", "78547033616792"--, "135216872825858"
+    "124228381910843", "132891780242917", "78547033616792", "71159838062692"
 }
 local counterSounds = {
     "71441046303493", "74444335852537", "110521080732746", 
-    "124228381910843", "132891780242917"--, "135216872825858"
+    "124228381910843", "132891780242917", "71159838062692"
 }
-if getTag(lp.Name) == "[ PREMIUM ]" then
+--[[if getTag(lp.Name) == "[ PREMIUM ]" then
     table.insert(dodgeSounds, "71159838062692")
     table.insert(counterSounds, "71159838062692")
-end
+end]]
 
 workspace.ChildAdded:Connect(function(obj)
     local gui = lp:FindFirstChildOfClass("PlayerGui")

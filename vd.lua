@@ -82,10 +82,6 @@ local blacklist = {
 local testers = {"Tgpeek1", "Technique12_12", "urboyfiePoP", "Bva_Back"}
 local WindUI = loadstring(game:HttpGet("https://github.com/Footagesus/WindUI/releases/latest/download/main.lua"))()
 
-if game.PlaceVersion < 10030 then
-    WindUI:Notify({ Title = "Azure Hub", Content = "This game version hasn't been tested for detections, use with aware.", Icon = "triangle-alert", Duration = 5 })
-end
-
 local function getTag(name)
     if getgenv().PREMIUM_KEY == true then
         return "[ PREMIUM ]"
