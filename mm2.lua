@@ -28,7 +28,7 @@ local blacklist = {
     [1848960] = true
 }
 local WindUI = loadstring(game:HttpGet("https://github.com/Footagesus/WindUI/releases/latest/download/main.lua"))()
-
+--getgenv().PREMIUM_KEY = true
 local function getTag(name)
     if getgenv().PREMIUM_KEY == true then
         return "[ PREMIUM ]"

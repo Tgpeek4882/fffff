@@ -2620,88 +2620,102 @@ local PitchTable = {
     [20] = 22.3
 }
 local FallbackPitch = 23.3
-local aimConnection = nil
+local aimConnection
 
-character:GetAttributeChangedSignal('spearmode'):Connect(function()
-    local isSpearMode = character:GetAttribute('spearmode')
+local function InitializeCharacter(newChar)
+    character = newChar
+    root = newChar:WaitForChild("HumanoidRootPart", 9)
 
     if aimConnection then 
         aimConnection:Disconnect() 
         aimConnection = nil 
     end
-    
-    if isSpearMode then 
-        aimConnection = game:GetService("RunService").RenderStepped:Connect(function()
-            if not (AutoAimNormalToggle or AutoAimChargedToggle) then return end
-            if not root then return end
+    newChar:GetAttributeChangedSignal('spearmode'):Connect(function()
+        local isSpearMode = newChar:GetAttribute('spearmode')
 
-            local targetChar = nil
-            local shortestMetric = math.huge
-            
-            for _, v in ipairs(game:GetService("Players"):GetPlayers()) do
-                if v ~= lp and v.Character then
-                    local char = v.Character
-                    
-                    if char:GetAttribute("IsHooked") or char:GetAttribute("IsCarried") or char:GetAttribute("Knocked") then continue end
+        if aimConnection then 
+            aimConnection:Disconnect() 
+            aimConnection = nil 
+        end
+        
+        if isSpearMode then 
+            aimConnection = game:GetService("RunService").RenderStepped:Connect(function()
+                if not (AutoAimNormalToggle or AutoAimChargedToggle) then return end
+                if not root then return end
 
-                    local tHead = char:FindFirstChild("Head")
-                    local tRoot = char:FindFirstChild("HumanoidRootPart")
-                    local tHum = char:FindFirstChild("Humanoid")
+                local targetChar = nil
+                local shortestMetric = math.huge
+                
+                for _, v in ipairs(game:GetService("Players"):GetPlayers()) do
+                    if v ~= lp and v.Character then
+                        local char = v.Character
+                        
+                        if char:GetAttribute("IsHooked") or char:GetAttribute("IsCarried") or char:GetAttribute("Knocked") then continue end
 
-                    if tHead and tRoot and tHum and tHum.Health > 0 then
-                        if AutoAimNormalToggle then
-                            local screenPos, onScreen = Camera:WorldToViewportPoint(tHead.Position)
-                            if onScreen then
-                                local dist2D = (Vector2.new(Mouse.X, Mouse.Y) - Vector2.new(screenPos.X, screenPos.Y)).Magnitude
-                                if dist2D < shortestMetric then
-                                    shortestMetric = dist2D
+                        local tHead = char:FindFirstChild("Head")
+                        local tRoot = char:FindFirstChild("HumanoidRootPart")
+                        local tHum = char:FindFirstChild("Humanoid")
+
+                        if tHead and tRoot and tHum and tHum.Health > 0 then
+                            if AutoAimNormalToggle then
+                                local screenPos, onScreen = Camera:WorldToViewportPoint(tHead.Position)
+                                if onScreen then
+                                    local dist2D = (Vector2.new(Mouse.X, Mouse.Y) - Vector2.new(screenPos.X, screenPos.Y)).Magnitude
+                                    if dist2D < shortestMetric then
+                                        shortestMetric = dist2D
+                                        targetChar = char
+                                    end
+                                end
+                            elseif AutoAimChargedToggle then
+                                local dist3D = (tHead.Position - root.Position).Magnitude
+                                if dist3D < shortestMetric then
+                                    shortestMetric = dist3D
                                     targetChar = char
                                 end
-                            end
-                        elseif AutoAimChargedToggle then
-                            local dist3D = (tHead.Position - root.Position).Magnitude
-                            if dist3D < shortestMetric then
-                                shortestMetric = dist3D
-                                targetChar = char
                             end
                         end
                     end
                 end
-            end
 
-            if not targetChar then return end
-            local tHead = targetChar.Head
-            local tVel = targetChar.HumanoidRootPart.Velocity
-            
-            local predictedPos = tHead.Position + (tVel * PredictionTime)
-            local camPos = Camera.CFrame.Position
-            local distToTarget = (predictedPos - camPos).Magnitude
-            
-            local finalPitch = 0
-
-            if AutoAimNormalToggle then
-                local alpha = math.clamp((distToTarget - MinDistance) / (MaxDistance - MinDistance), 0, 1)
-                finalPitch = MinPitch + (MaxPitch - MinPitch) * alpha
+                if not targetChar then return end
+                local tHead = targetChar.Head
+                local tVel = targetChar.HumanoidRootPart.Velocity
                 
-            elseif AutoAimChargedToggle then
-                local index = math.floor(distToTarget / 10)
-                finalPitch = PitchTable[index] or FallbackPitch
-            end
-            
-            local dir = (predictedPos - camPos).Unit
-            local yaw = math.atan2(dir.X, dir.Z)
-            local pitchRad = math.rad(finalPitch)
+                local predictedPos = tHead.Position + (tVel * PredictionTime)
+                local camPos = Camera.CFrame.Position
+                local distToTarget = (predictedPos - camPos).Magnitude
+                
+                local finalPitch = 0
 
-            local look = Vector3.new(
-                math.sin(yaw) * math.cos(pitchRad),
-                math.sin(pitchRad),
-                math.cos(yaw) * math.cos(pitchRad)
-            )
+                if AutoAimNormalToggle then
+                    local alpha = math.clamp((distToTarget - MinDistance) / (MaxDistance - MinDistance), 0, 1)
+                    finalPitch = MinPitch + (MaxPitch - MinPitch) * alpha
+                    
+                elseif AutoAimChargedToggle then
+                    local index = math.floor(distToTarget / 10)
+                    finalPitch = PitchTable[index] or FallbackPitch
+                end
+                
+                local dir = (predictedPos - camPos).Unit
+                local yaw = math.atan2(dir.X, dir.Z)
+                local pitchRad = math.rad(finalPitch)
 
-            Camera.CFrame = CFrame.new(camPos, camPos + look)
-        end)
-    end
-end)
+                local look = Vector3.new(
+                    math.sin(yaw) * math.cos(pitchRad),
+                    math.sin(pitchRad),
+                    math.cos(yaw) * math.cos(pitchRad)
+                )
+
+                Camera.CFrame = CFrame.new(camPos, camPos + look)
+            end)
+        end
+    end)
+end
+
+lp.CharacterAdded:Connect(InitializeCharacter)
+if lp.Character then
+    InitializeCharacter(lp.Character)
+end
 
 ReplicatedStorage:WaitForChild("Remotes"):WaitForChild("Chase"):WaitForChild("ChaseMusicEvent").OnClientEvent:Connect(function(action)
        if chasetheme == "Default" or (chasetheme ~= "Mila - Compass" and chasetheme ~= "Close To Me") then return end
