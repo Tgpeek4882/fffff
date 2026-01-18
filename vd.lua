@@ -10,6 +10,7 @@ local TweenService = cloneref(game:GetService("TweenService"))
 local SoundService = cloneref(game:GetService("SoundService"))
 local VIM = cloneref(game:GetService("VirtualInputManager"))
 local Mouse = lp:GetMouse()
+local FallRemote = ReplicatedStorage:WaitForChild("Remotes"):WaitForChild("Mechanics"):WaitForChild("Fall")
 
 local Toggles = {} 
 local character
@@ -172,7 +173,7 @@ Config = Tabs.Utilities:Tab({ Title = "|  Configuration", Icon = "settings" })
 
 local updparagraph = Logs:Paragraph({
     Title = "Update Logs",
-    Desc = "08.01.26\n[+] Auto Play (AI, BETA)\n[+] Auto Run (BETA)\n[+] Auto Farm (BETA)\n[+] Auto Loop (BETA)\n[+] Wall Hug\n[+] Version Checker (In-Built)\n\n07.01.26\n[+] Infinite Lunge (Premium)\n[+] Hook Farm (Screws Farm)\n[+] Auto Aim Charged Spear (Veil, Works)\n[+] Auto Aim Spear (Veil, Works)\n[+] Expand Hitboxes (Universal>Fun)\n[+] No Fall\n[/] Several Bug Fixes (Damage Aura, etc.)\n[/] Improved Things\n[/] Rewrited Code\n\n02.01.26\n[+] Veil (Infinite Abilities, Untested)\n[-] Jeff (Infinite Abilities, Patched)\n[/] Auto Parry Bug Fixes\n[/] More PC Support Features\n\n27.12.25\n[+] FOV Radius\n[/] Improved Invisibility\n[/] Improved Perfect Skill Checks\n\n24.12.25\n[/] Reverted Auto Aim Veil\n[/] Improved Auto Parry\n[/] Heavily Optimized Script\n[/] Optimized Auto Drop Pallets\n[/] Fixed ESP Not Working On Rooftop\n\n23.12.25\n[+] Invisibility\n[+] Auto Perfect Generator\n[+] Auto Perfect Heal\n[+] Potato Graphics (Boost FPS)\n[/] Improve Auto Parry (Works now, slightly improved)\n[/] Improve Auto Aim Veil (Still need to test, unstable)\n[/] ESP: Repaired Gens Highlights Green\n[/] Fix WalkSpeed Changer\n[/] Fix Hitbox Expander\n[/] Unlock FPS (built-in)\n[/] Fixed Lot Of Bugs (ex. script not loading)\n\n20.12.25\n[+] Auto Presents\n[+] ESP: Presents\n[/] Updated To Latest Data\n[/] Fixed New Detections\n[/] Fixed Lot Of Bugs\n\n18.12.25\n[+] Expand Killer Hitboxes (flashlight)\n[/] Improved Auto Attack (revolver)\n[/] Fixed Some Bugs (not desync)\n\n16.12.25\n[/] Fixed Shooting Takes Time\n[-] Expand Survivor Hitboxes (Detected)\n\n12.12.25\nUniversal Tab:\n[+] Desync\n[+] Desync Options\n- Hitbox Improving makes your server-side visualizer sync faster and move forward.\n- Fake Position makes everyone see you at the place you activated Desync.\n\n30.11.25\n[/] Updated To Latest Data\n[-] Grab Nearest Player (Detected)\n[-] Carry Nearest Player (Detected)\n\n14.11.25\n[-] ESP: Pumpkins\n\n8.10.25\n[+] Damage Aura\nDefense:\n[+] Grab Nearest Player (Premium)\n[+] Carry Nearest Player (Premium)\n\n31.10.25\n[+] Updated To Latest Data\n[+] Auto Drop Pallete\n[+] Auto Aim Spear (Veil)\n[+] Remove Veil Clothings\n[+] ESP: Pumpkins\n[/] Bug Fixes\n\n24.09.25\n[+] Hit Sound\n[+] Chase Theme\n[+] In-Built Auto Dodge Slash\n[+] In-Built Fix Carry Bug\n\n23.09.25\n[+] God Mode\n[-] No Damage Patched\n\n3.09.25\n[+] Violence District\n[+] Premium Features",
+    Desc = "18.01.26\n[+] Sacrifice Self\n[+] Unhook Aura\n[/] Unpatched No Fall\n[/] Auto Parry In Beta (Again) 😔\n[/] Minor Bug Fixes\n\n08.01.26\n[+] Auto Play (AI, BETA)\n[+] Auto Run (BETA)\n[+] Auto Farm (BETA)\n[+] Auto Loop (BETA)\n[+] Wall Hug\n[+] Version Checker (In-Built)\n\n07.01.26\n[+] Infinite Lunge (Premium)\n[+] Hook Farm (Screws Farm)\n[+] Auto Aim Charged Spear (Veil, Works)\n[+] Auto Aim Spear (Veil, Works)\n[+] Expand Hitboxes (Universal>Fun)\n[+] No Fall\n[/] Several Bug Fixes (Damage Aura, etc.)\n[/] Improved Things\n[/] Rewrited Code\n\n02.01.26\n[+] Veil (Infinite Abilities, Untested)\n[-] Jeff (Infinite Abilities, Patched)\n[/] Auto Parry Bug Fixes\n[/] More PC Support Features\n\n27.12.25\n[+] FOV Radius\n[/] Improved Invisibility\n[/] Improved Perfect Skill Checks\n\n24.12.25\n[/] Reverted Auto Aim Veil\n[/] Improved Auto Parry\n[/] Heavily Optimized Script\n[/] Optimized Auto Drop Pallets\n[/] Fixed ESP Not Working On Rooftop\n\n23.12.25\n[+] Invisibility\n[+] Auto Perfect Generator\n[+] Auto Perfect Heal\n[+] Potato Graphics (Boost FPS)\n[/] Improve Auto Parry (Works now, slightly improved)\n[/] Improve Auto Aim Veil (Still need to test, unstable)\n[/] ESP: Repaired Gens Highlights Green\n[/] Fix WalkSpeed Changer\n[/] Fix Hitbox Expander\n[/] Unlock FPS (built-in)\n[/] Fixed Lot Of Bugs (ex. script not loading)\n\n20.12.25\n[+] Auto Presents\n[+] ESP: Presents\n[/] Updated To Latest Data\n[/] Fixed New Detections\n[/] Fixed Lot Of Bugs\n\n18.12.25\n[+] Expand Killer Hitboxes (flashlight)\n[/] Improved Auto Attack (revolver)\n[/] Fixed Some Bugs (not desync)\n\n16.12.25\n[/] Fixed Shooting Takes Time\n[-] Expand Survivor Hitboxes (Detected)\n\n12.12.25\nUniversal Tab:\n[+] Desync\n[+] Desync Options\n- Hitbox Improving makes your server-side visualizer sync faster and move forward.\n- Fake Position makes everyone see you at the place you activated Desync.\n\n30.11.25\n[/] Updated To Latest Data\n[-] Grab Nearest Player (Detected)\n[-] Carry Nearest Player (Detected)\n\n14.11.25\n[-] ESP: Pumpkins\n\n8.10.25\n[+] Damage Aura\nDefense:\n[+] Grab Nearest Player (Premium)\n[+] Carry Nearest Player (Premium)\n\n31.10.25\n[+] Updated To Latest Data\n[+] Auto Drop Pallete\n[+] Auto Aim Spear (Veil)\n[+] Remove Veil Clothings\n[+] ESP: Pumpkins\n[/] Bug Fixes\n\n24.09.25\n[+] Hit Sound\n[+] Chase Theme\n[+] In-Built Auto Dodge Slash\n[+] In-Built Fix Carry Bug\n\n23.09.25\n[+] God Mode\n[-] No Damage Patched\n\n3.09.25\n[+] Violence District\n[+] Premium Features",
     Locked = false,
     Buttons = {
         {
@@ -211,8 +212,8 @@ local ParryDistance = 10
 local HitboxesRadius = 10
 local HookFarmToggle = false
 local HookTimes = 5
-local NoFallToggle = false
-local FallRemote = ReplicatedStorage:WaitForChild("Remotes"):WaitForChild("Mechanics"):WaitForChild("Fall")
+local NoStunToggle = false
+local UnhookAuraToggle = false
 
 local WalkToggle = false
 local currentSpeed = 28
@@ -232,6 +233,7 @@ local boxes = {}
 local names = {}
 local studs = {}
 local DrawingAvailable = (type(Drawing) == "table" or type(Drawing) == "userdata")
+local isFiring = false
 
 local targetanims = {
     [139369275981139] = true,
@@ -1579,7 +1581,6 @@ Toggles.DesyncHandle = OPSection:Toggle({
             if state then
                 enableHitboxDesync()
             else
-                Window:Close()
                 task.wait(0.1)
                 disableHitboxDesync()
             end
@@ -1898,6 +1899,14 @@ Toggles.AntiSlowHandle = KillerMiscSection:Toggle({
              AntislowToggle = state
        end
 })
+Toggles.NoStunHandle = KillerMiscSection:Toggle({
+    Title = "No Stun",
+    Desc = "Removes falling negative effects.",
+    Value = false,
+    Callback = function(state)
+        NoStunToggle = state 
+    end
+})
 KillerMiscSection:Button({
 	Title = "Enable Emotes",
 	Callback = function()
@@ -1981,7 +1990,7 @@ local SurvDefSection = TabHandles.Survivor:Section({
     Icon = "infinity"
 })
 Toggles.AutoParryHandle = SurvDefSection:Toggle({
-       Title = "Auto Parry Killer",
+       Title = "Auto Parry Killer (BETA)",
        Desc = "Automatically stuns killer parrying him, must have parrying dagger as survivor.",
        Value = false,
        Callback = function(state)
@@ -1996,13 +2005,33 @@ Toggles.ParrySliderHandle = SurvDefSection:Slider({
 		ParryDistance = tonumber(Value)
 	end
 })
+Toggles.UnhookAuraHandle = SurvDefSection:Toggle({
+    Title = "Unhook Aura",
+    Desc = "Unhooks hooked players when you're close.",
+    Value = false,
+    Callback = function(state)
+        UnhookAuraToggle = state 
+    end
+})
+
 if getrawmetatable and setreadonly then
 local mt = getrawmetatable(game)
 local oldNamecall = mt.__namecall
 setreadonly(mt, false)
 mt.__namecall = newcclosure(function(self, ...)
     local method = getnamecallmethod()
-    if NoFallToggle and self == FallRemote and method == "FireServer" then
+    if getgenv().NoFallToggle and self == FallRemote and method == "FireServer" then
+        pcall(function()
+            local conn
+            conn = hum:GetPropertyChangedSignal("WalkSpeed"):Connect(function()
+                if hum.WalkSpeed ~= 17 then
+                    hum.WalkSpeed = 17
+                end
+            end)
+            task.delay(2, function()
+                conn:Disconnect()
+            end)
+        end)
         return nil
     end
     return oldNamecall(self, ...)
@@ -2017,7 +2046,7 @@ Toggles.NoFallHandle = SurvDefSection:Toggle({
     Desc = "Removes falling negative effects.",
     Value = false,
     Callback = function(state)
-        NoFallToggle = state 
+        getgenv().NoFallToggle = state 
     end
 })
 SurvDefSection:Divider()
@@ -2089,6 +2118,14 @@ Toggles.RemoveClothingsHandle = SurvMiscSection:Toggle({
        Callback = function(state)
              RemoveClothingsToggle = state
        end
+})
+SurvMiscSection:Button({
+	Title = "Sacrifice Self",
+	Callback = function()
+	    if hum then
+	        hum.Health = 0
+	    end
+	end
 })
 SurvMiscSection:Button({
 	Title = "Instant Escape",
@@ -2212,6 +2249,7 @@ Toggles.WsToggleHandle = TabHandles.Player:Toggle({
 	Value = false,
 	Callback = function(state)
 		WalkToggle = state
+		firststate = state
 		if state then applyBypassSpeed() end
 	end
 })
@@ -2220,6 +2258,7 @@ Toggles.WsSliderHandle = TabHandles.Player:Slider({
 	Value = { Min = 10, Max = 100, Default = 28 },
 	Callback = function(Value)
 		currentSpeed = Value
+		firstspeed = Value
 	end
 })
 
@@ -2371,9 +2410,53 @@ task.spawn(function()
            character:SetAttribute("IsHooked", false)
            character:SetAttribute("Knocked", false)
         end
+        if NoStunToggle then
+           character:SetAttribute("IsStunned", false)
+        end
         if FlingToggle then
             fling()
         end
+if UnhookAuraToggle then
+    if root then
+        local foldersToSearch = { workspace.Map } 
+        local pathNames = {"Rooftop", "Nature"}
+        for _, name in ipairs(pathNames) do
+            local found = workspace.Map:FindFirstChild(name, true)
+            if found then
+                table.insert(foldersToSearch, found)
+            end
+        end
+
+        for _, container in ipairs(foldersToSearch) do
+            for _, obj in ipairs(container:GetChildren()) do
+                if obj.Name == "Hook" then
+                    local hookPoint = obj:FindFirstChild("HookPoint")
+                    
+                    if hookPoint then
+                        local distToMe = (root.Position - hookPoint.Position).Magnitude
+                        if distToMe < 15 then
+                            local playerOnHook = false
+                            for _, plr in ipairs(Players:GetPlayers()) do
+                                if plr ~= lp and plr.Character then
+                                    local pRoot = plr.Character:FindFirstChild("HumanoidRootPart")
+                                    if pRoot and (pRoot.Position - hookPoint.Position).Magnitude < 5 then
+                                        playerOnHook = true
+                                        break
+                                    end
+                                end
+                            end
+
+                            if playerOnHook then
+                                local args = { hookPoint }
+                                game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("Carry"):WaitForChild("UnHookEvent"):FireServer(unpack(args))
+                            end
+                        end
+                    end
+                end
+            end
+        end
+    end
+end
     end
 end)
 
