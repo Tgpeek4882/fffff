@@ -82,7 +82,7 @@ local blacklist = {
 }
 local testers = {"Tgpeek1", "Technique12_12", "urboyfiePoP", "Bva_Back"}
 local WindUI = loadstring(game:HttpGet("https://raw.githubusercontent.com/azurelw/azurehub/refs/heads/main/main.lua"))()
-
+--getgenv().PREMIUM_KEY = true
 local function getTag(name)
     if getgenv().PREMIUM_KEY == true then
         return "[ PREMIUM ]"
@@ -2122,8 +2122,9 @@ Toggles.RemoveClothingsHandle = SurvMiscSection:Toggle({
 SurvMiscSection:Button({
 	Title = "Sacrifice Self",
 	Callback = function()
-	    if hum then
+	    if hum and character then
 	        hum.Health = 0
+	        character:BreakJoints()
 	    end
 	end
 })
